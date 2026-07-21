@@ -108,7 +108,7 @@ fn find_graph_editor_executable() -> Option<PathBuf> {
         "release"
     };
 
-    let candidate = project_dir
+    let candidate = project_dir.join("addons")
         .join("grust_pcg")
         .join("pcg")
         .join("graph_editor")

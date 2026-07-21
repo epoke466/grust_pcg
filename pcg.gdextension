@@ -4,11 +4,11 @@ compatibility_minimum = 4.1
 reloadable = true
 
 [libraries]
-linux.debug.x86_64 =     "res://grust_pcg/pcg/godot_pcg/target/debug/libgodot_pcg.so"
-linux.release.x86_64 =   "res://grust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.so"
-windows.debug.x86_64 =   "res://grust_pcg/pcg/godot_pcg/target/debug/godot_pcg.dll"
-windows.release.x86_64 = "res://grust_pcg/pcg/godot_pcg/target/release/godot_pcg.dll"
-macos.debug =            "res://grust_pcg/pcg/godot_pcg/target/debug/libgodot_pcg.dylib"
-macos.release =          "res://grust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.dylib"
-macos.debug.arm64 =      "res://grust_pcg/pcg/godot_pcg/target/debug/libgodot_pcg.dylib"
-macos.release.arm64 =    "res://grust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.dylib"
+linux.debug.x86_64 =     "res://addons/grust_pcg/pcg/godot_pcg/target/debug/libgodot_pcg.so"
+linux.release.x86_64 =   "res://addons/grust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.so"
+windows.debug.x86_64 =   "res://addons/grust_pcg/pcg/godot_pcg/target/debug/godot_pcg.dll"
+windows.release.x86_64 = "res://addons/grust_pcg/pcg/godot_pcg/target/release/godot_pcg.dll"
+macos.debug =            "res://addons/grust_pcg/pcg/godot_pcg/target/debug/libgodot_pcg.dylib"
+macos.release =          "res://addons/grust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.dylib"
+macos.debug.arm64 =      "res://addons/grust_pcg/pcg/godot_pcg/target/debug/libgodot_pcg.dylib"
+macos.release.arm64 =    "res://gaddons/rust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.dylib"

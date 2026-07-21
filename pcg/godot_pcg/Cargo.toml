@@ -1,0 +1,14 @@
+[package]
+name = "godot_pcg"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+glam = "0.33.2"
+godot = "0.5.3"
+rand = "0.10.2"
+shared = { path = "../shared" }
+uuid = "1.23.3"

@@ -1,4 +1,8 @@
 # grust_pcg
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/bd014e15-2357-4c51-848a-74f3586b00fb" />
+Sample Graph:
+<img width="3420" height="945" alt="image" src="https://github.com/user-attachments/assets/2ac2d291-bc47-424b-a03d-f692e2e8b0a3" />
+
 ### Note
 This project is in a very very early stage of development. Many things will change. Some things will not work. I'm also building this on a MacBook Air and havent tested the plugin on Windows or Linux yet (I use CachyOS btw, I will test on linux and windows soon). It might work, it might not. It also has limited fuctionality at the moment but you can add to if if you want. Many new features are in the works. [Planned Features](Planed-Features)
 

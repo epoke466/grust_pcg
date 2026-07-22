@@ -4,9 +4,10 @@ Sample Graph:
 <img width="3420" height="945" alt="image" src="https://github.com/user-attachments/assets/2ac2d291-bc47-424b-a03d-f692e2e8b0a3" />
 
 ### Note
-This project is in a very very early stage of development. Many things will change. Some things will not work. I'm also building this on a MacBook Air and havent tested the plugin on Windows or Linux yet (I use CachyOS btw, I will test on linux and windows soon). It might work, it might not. It also has limited fuctionality at the moment but you can add to if if you want. Many new features are in the works. [Planned Features](Planed-Features)
+This project is in a very very early stage of development. Many things will change. Some things will not work. I'm also building this on a MacBook Air and havent tested the plugin on Windows or Linux yet (I use CachyOS btw, I will test on linux and windows soon). It might work, it might not. It also has limited fuctionality at the moment but you can add to if if you want. Many new features are in the works. 
 
-[Instalation instructions Here](Installation)
+**Scroll down for instalation structions**
+
 ## About
 Grust PCG is a plugin for godot that uses a node graph to procedurally spawn/instance meshes in your godot levels. PCG (Procedural Content Generation) is a modern workflow that allows developers and artists to create worlds/scenes with math, rather than handplaceing every single object. A good PCG framework allows artists/developers to maintain an artistic control over their world while significantly decreasing the amount of time required. Most people don't want to place 1 billion blades of grass by hand.
 

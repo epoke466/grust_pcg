@@ -11,4 +11,4 @@ windows.release.x86_64 = "res://addons/grust_pcg/pcg/godot_pcg/target/release/go
 macos.debug =            "res://addons/grust_pcg/pcg/godot_pcg/target/debug/libgodot_pcg.dylib"
 macos.release =          "res://addons/grust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.dylib"
 macos.debug.arm64 =      "res://addons/grust_pcg/pcg/godot_pcg/target/debug/libgodot_pcg.dylib"
-macos.release.arm64 =    "res://gaddons/rust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.dylib"
+macos.release.arm64 =    "res://addons/rust_pcg/pcg/godot_pcg/target/release/libgodot_pcg.dylib"

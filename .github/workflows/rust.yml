@@ -11,12 +11,23 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build
+    
+    - name: Build godot_pcg
       run: cargo build --verbose
-    - name: Run tests
+      working-directory: pcg/godot_pcg
+    
+    - name: Run tests for godot_pcg
       run: cargo test --verbose
+      working-directory: pcg/godot_pcg
+    
+    - name: Build graph_editor
+      run: cargo build --verbose
+      working-directory: pcg/graph_editor
+    
+    - name: Run tests for graph_editor
+      run: cargo test --verbose
+      working-directory: pcg/graph_editor

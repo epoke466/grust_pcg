@@ -17,29 +17,29 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Build godot_pcg
-      run: cargo build --verbose
+      run: cargo build --release --verbose
       working-directory: pcg/godot_pcg
     
     - name: Run tests for godot_pcg
-      run: cargo test --verbose
+      run: cargo test --release --verbose
       working-directory: pcg/godot_pcg
     
     - name: Build graph_editor
-      run: cargo build --verbose
+      run: cargo build --release --verbose
       working-directory: pcg/graph_editor
     
     - name: Run tests for graph_editor
-      run: cargo test --verbose
+      run: cargo test --release --verbose
       working-directory: pcg/graph_editor
     
     - name: Upload godot_pcg artifacts
       uses: actions/upload-artifact@v4
       with:
         name: godot_pcg-build
-        path: pcg/godot_pcg/target/
+        path: pcg/godot_pcg/target/release
     
     - name: Upload graph_editor artifacts
       uses: actions/upload-artifact@v4
       with:
         name: graph_editor-build
-        path: pcg/graph_editor/target/
+        path: pcg/graph_editor/target/release

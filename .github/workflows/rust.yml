@@ -31,3 +31,15 @@ jobs:
     - name: Run tests for graph_editor
       run: cargo test --verbose
       working-directory: pcg/graph_editor
+    
+    - name: Upload godot_pcg artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: godot_pcg-build
+        path: pcg/godot_pcg/target/
+    
+    - name: Upload graph_editor artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: graph_editor-build
+        path: pcg/graph_editor/target/

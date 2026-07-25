@@ -15,10 +15,12 @@ pub mod pcg_node {
 
         //Spawners
         MeshInstancer,
+        MeshDensityInstancer,
 
         //Inputs
         FloatInput,
-        SplineInput,
+        GetSplines,
+        GetSplineIndexes,
         MeshInput,
 
         //Math
@@ -28,11 +30,15 @@ pub mod pcg_node {
         Divide,
         Mod,
 
-        //Density
-        DistanceDensity,
+        //Density & Distance
+        Distance,
+        InvertDistance,
+        DistanceToDensity,
         //NormalDensity,
-        NoiseDensity,
         PerlinNoise,
+        NoiseDensity,
+        InvertDensity,
+        NormalizeDensity,
 
         //Filters
         AttributeFilter,
@@ -63,12 +69,36 @@ pub mod pcg_node {
         pub fn new(node_type: PCGNodeType, position: (f32, f32)) -> Self {
             let node_id = Uuid::new_v4();
             match node_type {
-                SplineInput => Self {
+                GetSplines => Self {
                     id: node_id,
                     node_type: node_type,
                     inputs: vec![],
                     outputs: vec![Pin::new("Splines", SplineArray, node_id)],
                     position: position,
+                },
+                GetSplineIndexes => Self {
+                    id: node_id,
+                    node_type: node_type,
+                    inputs: vec![Pin::new("Indexes", FloatRange, node_id)],
+                    outputs: vec![Pin::new("Splines", SplineArray, node_id)],
+                    position: position,
+                },
+                Distance => Self {
+                    id: node_id,
+                    node_type: node_type,
+                    inputs: vec![
+                        Pin::new("Points", PointArray, node_id),
+                        Pin::new("Distance From", PointArray, node_id),
+                    ],
+                    outputs: vec![Pin::new("Points", PointArray, node_id)],
+                    position,
+                },
+                InvertDensity | NormalizeDensity | InvertDistance | DistanceToDensity => Self {
+                    id: node_id,
+                    node_type: node_type,
+                    inputs: vec![Pin::new("Points", PointArray, node_id)],
+                    outputs: vec![Pin::new("Points", PointArray, node_id)],
+                    position,
                 },
                 SnapToSurface => Self {
                     id: node_id,
@@ -99,6 +129,16 @@ pub mod pcg_node {
                     position: position,
                 },
                 MeshInstancer => Self {
+                    id: node_id,
+                    node_type,
+                    inputs: vec![
+                        Pin::new("Points", PointArray, node_id),
+                        Pin::new("Meshes", MeshArray, node_id),
+                    ],
+                    outputs: vec![],
+                    position,
+                },
+                MeshDensityInstancer => Self {
                     id: node_id,
                     node_type,
                     inputs: vec![

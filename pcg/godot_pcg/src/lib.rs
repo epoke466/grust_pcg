@@ -1,12 +1,12 @@
 use godot::classes::{
-    multi_mesh, CollisionShape3D, Curve3D, EditorPlugin, IEditorPlugin, Mesh, MultiMesh,
-    MultiMeshInstance3D, Path3D, PhysicsRayQueryParameters3D, ProjectSettings,
+    CollisionShape3D, Curve3D, EditorPlugin, IEditorPlugin, Mesh, MultiMesh, MultiMeshInstance3D,
+    Path3D, PhysicsRayQueryParameters3D, ProjectSettings, multi_mesh,
 };
 
-use glam::{vec3a, Quat};
+use glam::{Quat, vec3a};
 use godot::prelude::*;
 use rand::{
-    distr::{weighted::WeightedIndex, Distribution},
+    distr::{Distribution, weighted::WeightedIndex},
     rng,
 };
 use shared::*;
@@ -108,7 +108,8 @@ fn find_graph_editor_executable() -> Option<PathBuf> {
         "release"
     };
 
-    let candidate = project_dir.join("addons")
+    let candidate = project_dir
+        .join("addons")
         .join("grust_pcg")
         .join("pcg")
         .join("graph_editor")
@@ -162,7 +163,7 @@ impl PCGZone {
         let mut meshes: HashMap<Uuid, Gd<Mesh>> = HashMap::new();
         for node in &graph.nodes {
             //Seed stuff in here which needs data from godot.
-            if node.node_type == PCGNodeType::SplineInput {
+            if node.node_type == PCGNodeType::GetSplines {
                 let spline_array = &self.splines;
                 let mut spline_data: Vec<SplineData> = vec![];
                 for spline in spline_array.iter_shared() {
@@ -353,5 +354,35 @@ impl GraphHost for GodotHost<'_> {
         distance: f32,
     ) -> Vec<PCGPoint> {
         self.zone.snap_points(points, from_height, distance)
+    }
+    fn get_meshs_from_indexes(&mut self, is: &Vec<usize>) -> Vec<MeshRef> {
+        let mut refs: Vec<MeshRef> = vec![];
+        for i in is {
+            if let Some(m) = self.zone.spawn_meshes.get(i.to_owned()) {
+                let id = Uuid::new_v4();
+                refs.push(MeshRef {
+                    id: id,
+                    count: 0,
+                    probability: 1.0,
+                });
+                self.meshes.insert(id, m);
+            }
+        }
+        refs
+    }
+    fn get_splines_from_indexes(&mut self, is: &Vec<usize>) -> Vec<SplineData> {
+        is.iter()
+            .filter_map(|i| {
+                // Use and_then to cleanly chain optional lookups
+                let s = self.zone.splines.get(*i)?;
+                let curve = s.get_curve()?;
+
+                // Return the successful data wrapped in Some
+                Some(path3d_to_spline_data(&curve, &s)) // Note: fixed `&spline` to `&s` assuming typo
+            })
+            .collect()
+    }
+    fn gprint(&mut self, txt: String) {
+        godot_print!("{}", txt)
     }
 }

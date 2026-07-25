@@ -8,6 +8,7 @@ pub mod point {
         pub rotation: Quat,
         pub scale: Vec3A,
         pub density: f32,
+        pub distance: f32,
     }
 
     impl PCGPoint {
@@ -16,6 +17,7 @@ pub mod point {
             rotation: Quat::IDENTITY,
             scale: Vec3A::ONE,
             density: 1.0,
+            distance: 0.0,
         };
 
         pub fn from_position(position: Vec3A) -> Self {

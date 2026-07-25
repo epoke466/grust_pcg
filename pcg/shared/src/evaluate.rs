@@ -8,7 +8,7 @@ pub mod eval {
 
     use glam::{Quat, Vec3A};
     use noise::{NoiseFn, Perlin as PerlinNoiseFn};
-    use rand::RngExt;
+    use rand::{RngExt, rng};
     use std::collections::HashMap;
     use uuid::Uuid;
 
@@ -65,9 +65,12 @@ pub mod eval {
             from_height: f32,
             distance: f32,
         ) -> Vec<PCGPoint>;
+        fn get_splines_from_indexes(&mut self, is: &Vec<usize>) -> Vec<SplineData>;
+        fn get_meshs_from_indexes(&mut self, is: &Vec<usize>) -> Vec<MeshRef>;
+        fn gprint(&mut self, txt: String);
     }
 
-    fn get_input<T: FromPin>(
+    pub fn get_input<T: FromPin>(
         inputs: &HashMap<String, PinValue>,
         name: &str,
         node_id: Uuid,
@@ -125,7 +128,16 @@ pub mod eval {
             }
 
             match node.node_type {
-                PCGNodeType::SplineInput | PCGNodeType::MeshInput | PCGNodeType::FloatInput => {} // already seeded
+                PCGNodeType::GetSplines | PCGNodeType::MeshInput | PCGNodeType::FloatInput => {} // already seeded
+                PCGNodeType::GetSplineIndexes => {
+                    let f_range: (f32, f32) = get_input!("Indexes")?;
+                    let splines = host.get_splines_from_indexes(
+                        &(f_range.0 as usize..=f_range.1 as usize).collect(),
+                    );
+                    let p = splines.len();
+                    host.gprint(p.to_string());
+                    values.insert(node.outputs[0].id, PinValue::SplineArray(splines));
+                }
                 PCGNodeType::PerlinNoise => {
                     let offset: Vec3A = get_input!("Offset").map(|PositionValue(v)| v)?;
                     let scale: Vec3A = get_input!("Scale").map(|ScaleValue(v)| v)?;
@@ -150,6 +162,70 @@ pub mod eval {
                         let pos = (point.position + noise.offset) * noise.scale;
                         point.density =
                             noise_func.get([pos.x as f64, pos.y as f64, pos.z as f64]) as f32;
+                    }
+
+                    values.insert(node.outputs[0].id, PinValue::PointArray(points));
+                }
+                PCGNodeType::Distance => {
+                    let mut points: Vec<PCGPoint> = get_input!("Points")?;
+                    let other_points: Vec<PCGPoint> = get_input!("Distance From")?;
+                    host.gprint(other_points.len().to_string());
+                    for point in points.iter_mut() {
+                        let mut closest_point = other_points[0];
+
+                        for op in &other_points {
+                            let point_to_op = op.position.distance(point.position);
+                            let point_to_closest = closest_point.position.distance(point.position);
+
+                            if point_to_op < point_to_closest {
+                                closest_point = op.clone();
+                            }
+                        }
+                        point.distance = closest_point.position.distance(point.position);
+                    }
+
+                    values.insert(node.outputs[0].id, PinValue::PointArray(points));
+                }
+                PCGNodeType::InvertDensity => {
+                    let mut points: Vec<PCGPoint> = get_input!("Points")?;
+                    for point in points.iter_mut() {
+                        point.density = 1.0 - point.density.clamp(0.0, 1.0);
+                    }
+
+                    values.insert(node.outputs[0].id, PinValue::PointArray(points));
+                }
+                PCGNodeType::NormalizeDensity => {
+                    let mut points: Vec<PCGPoint> = get_input!("Points")?;
+                    let (min, max): (f32, f32) = points.iter().fold((0.0, 1.0), |(min, max), x| {
+                        (min.min(x.density), max.max(x.density))
+                    });
+
+                    let range = max - min;
+
+                    points
+                        .iter_mut()
+                        .for_each(|p| p.density = (p.density - min) / range);
+
+                    values.insert(node.outputs[0].id, PinValue::PointArray(points));
+                }
+                PCGNodeType::InvertDistance => {
+                    let mut points: Vec<PCGPoint> = get_input!("Points")?;
+                    for point in points.iter_mut() {
+                        point.density = 1.0 - point.density.clamp(0.0, 1.0);
+                    }
+
+                    values.insert(node.outputs[0].id, PinValue::PointArray(points));
+                }
+                PCGNodeType::DistanceToDensity => {
+                    let mut points: Vec<PCGPoint> = get_input!("Points")?;
+                    let (min, max) = points
+                        .iter()
+                        .fold((f32::INFINITY, f32::NEG_INFINITY), |(min, max), &x| {
+                            (min.min(x.distance.abs()), max.max(x.distance.abs()))
+                        }); //I love rust <3
+                    let range = max - min;
+                    for point in points.iter_mut() {
+                        point.density = (point.distance.abs() - min) / range
                     }
 
                     values.insert(node.outputs[0].id, PinValue::PointArray(points));
@@ -197,6 +273,15 @@ pub mod eval {
                 PCGNodeType::MeshInstancer => {
                     let points: Vec<PCGPoint> = get_input!("Points")?;
                     let mut meshes: Vec<MeshRef> = get_input!("Meshes")?;
+                    host.spawn_meshes(&mut meshes, &points);
+                }
+                PCGNodeType::MeshDensityInstancer => {
+                    let mut points: Vec<PCGPoint> = get_input!("Points")?;
+                    let mut meshes: Vec<MeshRef> = get_input!("Meshes")?;
+                    let mut r = rng();
+
+                    points.retain(|point| point.density > r.random_range(0.0..1.0));
+
                     host.spawn_meshes(&mut meshes, &points);
                 }
                 PCGNodeType::SnapToSurface => {

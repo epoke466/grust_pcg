@@ -107,16 +107,31 @@ fn find_graph_editor_executable() -> Option<PathBuf> {
     } else {
         "release"
     };
+    let os = if cfg!(target_os = "windows") {
+        "win"
+    } else if cfg!(target_os = "macos") {
+        "mac"
+    } else {
+        "lnx"
+    };
 
-    let candidate = project_dir
-        .join("addons")
-        .join("grust_pcg")
-        .join("pcg")
-        .join("graph_editor")
-        .join("target")
-        .join(profile)
-        .join(binary_name);
-
+    let candidate = if profile == "debug" {
+        project_dir
+            .join("addons")
+            .join("grust_pcg")
+            .join("pcg")
+            .join("graph_editor")
+            .join("target")
+            .join(profile)
+            .join(binary_name)
+    } else {
+        project_dir
+            .join("addons")
+            .join("grust_pcg")
+            .join(os)
+            .join("graph_editor")
+            .join(binary_name)
+    };
     godot_print!("{:?}", candidate.to_str().unwrap());
 
     candidate.exists().then_some(candidate)

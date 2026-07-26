@@ -4,7 +4,7 @@ Sample Graph:
 <img width="3420" height="945" alt="image" src="https://github.com/user-attachments/assets/2ac2d291-bc47-424b-a03d-f692e2e8b0a3" />
 
 ### Note
-This project is in a very very early stage of development. Many things will change. Some things will not work. I'm also building this on a MacBook Air and havent tested the plugin on Windows or Linux yet. It might work, it might not. It also has limited fuctionality at the moment but you can add to if if you want. Many new features are in the works. 
+This project is in a very very early stage of development. Many things will change. Some things will not work. It also has limited fuctionality at the moment but you can add to if if you want. Many new features are in the works. 
 
 [Installation](#installation)
 
@@ -37,8 +37,10 @@ Currently the way this functions is you open the graph editor from Godot (Projec
 1. Go to [releases](https://github.com/epoke466/grust_pcg/releases)
 2. Download the latest release (grust_pcg.zip file)
 3. Extract the file
-4. Move the extracted folder (it should be called grust_pcg) to the addons folder in your Godot project.
-5. Enjoy, unless your on MacOS in which case see below...
+4. The grust_pcg folder should contain a .gdextention file, and lnx, mac, and win folders. If the one you have contains another grust_pcg folder and a MacOSX folder, the one that you want is the second grust_pcg folder.
+    - This folder fiasco is caused by differences in opperating systems and file extraction software
+6. Move the correct grust_pcg folder into your Godot project's addons folder, or make a new addons folder if you don't have one yet.
+7. Enjoy, unless your on MacOS in which case see below...
 
 Currently on MacOS you will have to fight with code signing issues, you can override it with terminal if you know how to, you can ask AI too, or you can do what I do:
 

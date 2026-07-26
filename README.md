@@ -35,10 +35,22 @@ Currently the way this functions is you open the graph editor from Godot (Projec
 
 ## Installation
 1. Go to [releases](https://github.com/epoke466/grust_pcg/releases)
-2. Download the latest release
+2. Download the latest release (grust_pcg.zip file)
 3. Extract the file
 4. Move the extracted folder (it should be called grust_pcg) to the addons folder in your Godot project.
-5. Enjoy!
+5. Enjoy, unless your on MacOS in which case see below...
+
+Currently on MacOS you will have to fight with code signing issues, you can override it with terminal if you know how to, you can ask AI too, or you can do what I do:
+
+open system settings -> Privacy & security
+scroll to the bottom
+open your godot project with the plugin installed
+you will get a popup with the options move to trash and ok, ignore it for now
+look in your settings for a button that says override or allow anyways on the .dylib file and click it
+then spam the oks on the prompt and the override button in settings until you get a prompt that has a open anyway option
+click open anyway
+repeat the same steps for when you open the graph editor
+Linux & Windows are not tested yet but should work
 
 You can also build from source.
 

@@ -129,7 +129,6 @@ fn find_graph_editor_executable() -> Option<PathBuf> {
             .join("addons")
             .join("grust_pcg")
             .join(os)
-            .join("graph_editor")
             .join(binary_name)
     };
     godot_print!("{:?}", candidate.to_str().unwrap());

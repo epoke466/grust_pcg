@@ -1,4 +1,6 @@
 mod defalut {
+    use std::path::PathBuf;
+
     use crate::AppTheme;
     use crate::Config;
 
@@ -6,6 +8,7 @@ mod defalut {
         fn default() -> Self {
             Self {
                 theme: AppTheme::Dark,
+                last_opened_directory: PathBuf::new(),
             }
         }
     }

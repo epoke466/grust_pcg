@@ -60,7 +60,8 @@ mod view {
                                 text("Right click on a pin to enter a value"),
                                 text("Left click on a pin to connect it"),
                                 text("Hold 'X' and click to delete a graph or a node"),
-                                text("In order to use your graph, you must save it by clicking the save button")
+                                text("In order to use your graph, you must save it by clicking the save button"),
+                                text("CMD/CTRL + Scroll to zoom in and out")
                             ]
                             .align_x(Center)
                         )

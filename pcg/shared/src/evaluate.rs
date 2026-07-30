@@ -286,7 +286,7 @@ pub mod eval {
                 }
                 PCGNodeType::SnapToSurface => {
                     let points: Vec<PCGPoint> = get_input!("Points")?;
-                    let start_above: f32 = get_input!("Start Above")?; // if TransformRange impls FromPin as a tuple, or add a dedicated impl
+                    let start_above: f32 = get_input!("Start Above")?;
                     let distance: f32 = get_input!("Distance")?;
 
                     let transformed_points: Vec<PCGPoint> =
@@ -296,7 +296,7 @@ pub mod eval {
                 }
                 PCGNodeType::TransfromPoints => {
                     let points: Vec<PCGPoint> = get_input!("Points")?;
-                    let trans: PCGPoint = get_input!("Transform")?; // if TransformRange impls FromPin as a tuple, or add a dedicated impl
+                    let trans: PCGPoint = get_input!("Transform")?;
                     let weight: f32 = get_input!("Weight")?;
 
                     let transformed_points: Vec<PCGPoint> = points
@@ -334,7 +334,7 @@ pub mod eval {
                 }
                 PCGNodeType::TransformPointsRange => {
                     let points: Vec<PCGPoint> = get_input!("Points")?;
-                    let (low, high): (PCGPoint, PCGPoint) = get_input!("Transform")?; // if TransformRange impls FromPin as a tuple, or add a dedicated impl
+                    let (low, high): (PCGPoint, PCGPoint) = get_input!("Transform")?;
                     let weight: f32 = get_input!("Weight")?;
 
                     let mut rng = rand::rng();

@@ -10,7 +10,7 @@ pub mod graph {
         pub version: i64,
     }
 
-    // Save
+    /// Save
     pub fn save_graph_file(path: &str, graph: &PCGGraph) -> Result<(), Box<dyn Error>> {
         let contents = ron::ser::to_string_pretty(graph, ron::ser::PrettyConfig::default())?;
         fs::write(path, contents)?;
@@ -42,7 +42,7 @@ pub mod graph {
         Ok(())
     }
 
-    //Delete
+    ///Delete
     pub fn delete_graph_file(path: &PathBuf, graph_name: &str) -> Result<(), Box<dyn Error>> {
         let deleted_path = path.join("deleted");
         fs::create_dir_all(&deleted_path)?;
@@ -50,7 +50,6 @@ pub mod graph {
         let graph_path = path.join(format!("{graph_name}"));
         let deleted_graph_path = deleted_path.join(format!("{graph_name}"));
 
-        //std::fs::rename(graph_path, deleted_graph_path)?;
         match fs::rename(&graph_path, &deleted_graph_path) {
             Ok(_) => {
                 trim_deleted_folder(&deleted_path).unwrap();

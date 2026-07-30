@@ -48,7 +48,7 @@ struct PinInputEditor {
     visible: bool,
     position: Point,
     current_pin_uuid: Uuid,
-    data: Option<Vec<(String, Vec<String>)>>, //A list of names and their respective valuss
+    data: Option<Vec<(String, Vec<String>)>>,
 }
 
 #[derive(Debug)]
@@ -161,7 +161,9 @@ impl GraphEditor {
             Message::OpenDirectoryPicker => {
                 let folder = FileDialog::new().pick_folder();
                 if let Some(v) = folder {
-                    self.working_directory = v;
+                    self.working_directory = v.clone();
+                    self.config.last_opened_directory = v;
+                    self.save_config();
                     self.update_graph_list();
                 };
                 Task::none()
@@ -229,10 +231,10 @@ impl GraphEditor {
                 if !name.ends_with(".pcg") {
                     name.push_str(".pcg");
                 }
-                self.graph_name = name; // set name first
-                self.graph = PCGGraph::default(); // reset graph to blank
+                self.graph_name = name;
+                self.graph = PCGGraph::default();
                 self.new_graph_name = String::default();
-                self.save_graph(); // now saves to the right path
+                self.save_graph();
                 self.update_graph_list();
                 Task::none()
             }
@@ -261,7 +263,7 @@ impl GraphEditor {
             }
             Message::LeftClickCanvas => {
                 let mut connection_to_make: Option<(Uuid, Uuid)> = None;
-                let mut pins_to_disconect: Vec<Uuid> = vec![]; // Store IDs instead of references to prevent borrowing issues
+                let mut pins_to_disconect: Vec<Uuid> = vec![];
                 let mut canvas_update: Option<(Point, bool, Color, Uuid)> = None;
                 let mut node_to_add: Option<PCGNode> = None;
                 let mut nodes_to_remove: Vec<Uuid> = vec![];
@@ -355,7 +357,6 @@ impl GraphEditor {
                                 <= 5.0
                             //Check the distance
                             {
-                                // CRITICAL FIX: Use immutable lookup here to avoid collision
                                 if self.canvas.connecting && self.canvas.is_input {
                                     if let Some(last_pin) =
                                         pin_from_uuid_immut(&self.graph, self.canvas.last_pin)
@@ -376,8 +377,6 @@ impl GraphEditor {
                                 break 'outer;
                             }
                         }
-                    } else {
-                        print!("naw")
                     }
                 }
 
@@ -691,6 +690,8 @@ fn main() -> iced::Result {
         || {
             let mut state = GraphEditor::default();
             state.load_config(); // Config loads here with your serialized enum
+            state.working_directory = state.config.last_opened_directory.clone();
+            state.update_graph_list();
             (state, iced::Task::none())
         },
         GraphEditor::update,
@@ -699,7 +700,6 @@ fn main() -> iced::Result {
     .settings(settings)
     .subscription(GraphEditor::subscription)
     .title("Graph Editor")
-    // Fix: Pass a closure that inspects the running state and converts the enum
     .theme(|state: &GraphEditor| state.config.theme.to_iced_theme())
     .run();
 

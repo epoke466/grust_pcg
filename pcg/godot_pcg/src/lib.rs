@@ -13,14 +13,13 @@ use shared::*;
 use std::{collections::HashMap, path::PathBuf};
 use uuid::Uuid;
 
-// ── Godot plugin ──────────────────────────────────────────────────────────────
 #[derive(GodotClass)]
 #[class(tool, init, base=EditorPlugin)]
 struct PCGPlugin {
     base: Base<EditorPlugin>,
 }
 
-//This is our good boi who does the actuall spawning of meshes
+//This is what the shared library can interact with to spawn stuff
 struct GodotHost<'a> {
     zone: &'a mut PCGZone,
     meshes: HashMap<Uuid, Gd<Mesh>>,
@@ -198,7 +197,7 @@ impl PCGZone {
                         count: 0,
                         probability: 1.0,
                     });
-                    meshes.insert(mesh_id, mesh.clone()); // Gd<T> is cheap to clone, just a ref-counted handle
+                    meshes.insert(mesh_id, mesh.clone());
                 }
                 seeds.insert(node.outputs[0].id, PinValue::MeshArray(mesh_refs));
             }
@@ -218,23 +217,17 @@ impl PCGZone {
         from_height: f32,
         distance: f32,
     ) -> Vec<PCGPoint> {
-        godot_print!("Snapp");
-        // 1. Get the World3D via self.base()
+        //You need to first get the world and physics server in order to raycat
         let world = self.base().get_world_3d().expect("World3D not found");
-
-        // 2. Get the space RID (required for space_set_active)
         let space_rid = world.get_space();
 
-        // 3. Force Godot to update collider positions in the physics engine
         let mut phys_server = godot::classes::PhysicsServer3D::singleton();
         phys_server.space_set_active(space_rid, true);
 
-        // 4. Get the space state for casting rays
         let mut space_state = world
             .get_direct_space_state()
             .expect("Physics space state not found");
 
-        // 5. Use new_gd() instead of new_alloc() because this is a RefCounted object!
         let mut query = PhysicsRayQueryParameters3D::new_gd();
 
         let mut snapped_points: Vec<PCGPoint> = vec![];
@@ -242,7 +235,6 @@ impl PCGZone {
         for p in points {
             let start = p.position;
 
-            // Update the query in-place
             query.set_from(Vector3 {
                 x: start.x,
                 y: start.y + from_height,
@@ -254,17 +246,9 @@ impl PCGZone {
                 z: start.z,
             });
 
-            // Run the ray cast
             let result = space_state.intersect_ray(&query);
-            godot_print!(
-                "ray from {:?} to {:?} -> hit: {}",
-                query.get_from(),
-                query.get_to(),
-                !result.is_empty()
-            );
 
             if !result.is_empty() {
-                // Handle your hit data here
                 let position = result.get("position").unwrap().to::<Vector3>();
                 let normal = result.get("normal").unwrap().to::<Vector3>();
                 let quat = Quaternion::from_rotation_arc(Vector3::UP, normal);
@@ -310,7 +294,6 @@ impl GraphHost for GodotHost<'_> {
         let weights: Vec<f32> = meshes.iter().map(|m| m.probability.abs()).collect();
         let dist = WeightedIndex::new(weights).unwrap();
 
-        // FIX 1: Store exactly which mesh each point belongs to
         let mut point_assignments = Vec::with_capacity(points.len());
         for _ in 0..points.len() {
             let mesh_idx = dist.sample(&mut rng);
@@ -339,10 +322,8 @@ impl GraphHost for GodotHost<'_> {
             let local_pos = inv * world_pos;
             let xform = Transform3D::new(Basis::IDENTITY, local_pos);
 
-            // FIX 2: Retrieve the exact mesh index we decided on earlier
             let i = point_assignments[idx];
 
-            // FIX 3: Get the 0-based index first, apply transform, THEN increment
             let instance_index = spawned_counts[i];
             multi_meshes[i].set_instance_transform(instance_index, xform);
             spawned_counts[i] += 1;
@@ -387,12 +368,10 @@ impl GraphHost for GodotHost<'_> {
     fn get_splines_from_indexes(&mut self, is: &Vec<usize>) -> Vec<SplineData> {
         is.iter()
             .filter_map(|i| {
-                // Use and_then to cleanly chain optional lookups
                 let s = self.zone.splines.get(*i)?;
                 let curve = s.get_curve()?;
 
-                // Return the successful data wrapped in Some
-                Some(path3d_to_spline_data(&curve, &s)) // Note: fixed `&spline` to `&s` assuming typo
+                Some(path3d_to_spline_data(&curve, &s))
             })
             .collect()
     }

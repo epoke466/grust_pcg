@@ -137,7 +137,7 @@ pub mod drawing {
     }
 
     impl PCGNode {
-        //Gets the position for the specified input index
+        ///Gets the position for the specified input index
         pub fn get_input_position(&self, index: usize) -> Point {
             Point {
                 x: self.position.0,
@@ -145,7 +145,7 @@ pub mod drawing {
             }
         }
 
-        //Gets the position for the specified output index
+        ///Gets the position for the specified output index
         pub fn get_output_position(&self, index: usize) -> Point {
             Point {
                 x: self.position.0 + NODEWIDTH,
@@ -153,7 +153,7 @@ pub mod drawing {
             }
         }
 
-        //Gets the rectangle that is the dragable top bar of a node
+        ///Gets the rectangle that is the dragable top bar of a node
         pub fn get_drag_zone(&self) -> Rectangle {
             let point =
                 Point::from(self.position) + Vector::new(NODE_DRAG_OFFSET, NODE_DRAG_OFFSET);
@@ -169,7 +169,7 @@ pub mod drawing {
             }
         }
 
-        //Draws the node on a frame
+        ///Draws the node on a frame
         pub fn draw_on_frame(&self, frame: &mut Frame, trans: (f32, f32, f32, f32)) {
             let bg = transform_path(
                 canvas::Path::rounded_rectangle(

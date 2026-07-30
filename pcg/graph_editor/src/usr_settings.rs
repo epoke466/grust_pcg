@@ -1,4 +1,6 @@
 pub mod settings {
+    use std::path::PathBuf;
+
     use crate::{GraphEditor, Message, Screen, TOP_BAR_BUTTON_PADDING};
     use iced::Theme::*;
     use iced::widget::container::bordered_box;
@@ -19,6 +21,7 @@ pub mod settings {
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Config {
         pub theme: AppTheme,
+        pub last_opened_directory: PathBuf,
     }
 
     #[derive(Serialize, Deserialize, Debug, EnumIter, PartialEq, Display, Clone)]

@@ -1,5 +1,4 @@
 pub mod pin {
-    //use crate::*;
     use crate::{
         DataType::*, EvalError, Floatable, MeshRef, PCGGraph, PCGPoint, PinValue::FloatRange,
         SplineData,
@@ -186,7 +185,8 @@ pub mod pin {
         fn from_pin(pv: PinValue) -> Option<Self>;
     }
 
-    //Some meta magic be going on here
+    //Some meta magic be going on here, ima be fr claude did this part for me,
+    // I can't read it at all but its nice to have, and easy to duplicate
     macro_rules! impl_from_pin {
         ($ty:ty, $variant:ident, $name:expr) => {
             impl FromPin for $ty {
@@ -217,7 +217,7 @@ pub mod pin {
                 const NAME: &'static str = $name;
                 fn from_pin(pv: PinValue) -> Option<Self> {
                     if let PinValue::$variant($($field),+) = pv {
-                        Some(Self(($($field),+)))   // <- extra parens: pack fields into one tuple, then pass that single tuple to Self(..)
+                        Some(Self(($($field),+)))
                     } else {
                         None
                     }
@@ -287,7 +287,7 @@ pub mod pin {
                     }),
                 },
                 DataType::FloatRange => {
-                    let v: Vec<f32> = dv.to_float()?; // The '?' unwraps the Vec if all succeeded
+                    let v: Vec<f32> = dv.to_float()?;
                     Ok(FloatRange(v[0], v[1]))
                 }
                 DataType::Bool => match dv[0].parse::<bool>() {
@@ -298,10 +298,7 @@ pub mod pin {
                     }),
                 },
                 DataType::TransformRange => {
-                    // 1. Parse strings into f32s, converting any parse errors into your EvalError
-                    let v: Vec<f32> = dv.to_float()?; // The '?' unwraps the Vec if all succeeded
-
-                    // 2. Build the transform range using the parsed indices
+                    let v: Vec<f32> = dv.to_float()?;
                     // These are the indexes
 
                     // Position 0, 1, 2
@@ -328,18 +325,18 @@ pub mod pin {
                     ))
                 }
                 DataType::PositionRange => {
-                    let v: Vec<f32> = dv.to_float()?; // The '?' unwraps the Vec if all succeeded
+                    let v: Vec<f32> = dv.to_float()?;
                     Ok(PinValue::PositionRange(
                         vec3a(v[0], v[1], v[2]),
                         vec3a(v[3], v[4], v[5]),
                     ))
                 }
                 DataType::Position => {
-                    let v: Vec<f32> = dv.to_float()?; // The '?' unwraps the Vec if all succeeded
+                    let v: Vec<f32> = dv.to_float()?;
                     Ok(PinValue::Position(vec3a(v[0], v[1], v[2])))
                 }
                 DataType::Scale => {
-                    let v: Vec<f32> = dv.to_float()?; // The '?' unwraps the Vec if all succeeded
+                    let v: Vec<f32> = dv.to_float()?;
                     Ok(PinValue::Scale(vec3a(v[0], v[1], v[2])))
                 }
                 DataType::RotationRange => {

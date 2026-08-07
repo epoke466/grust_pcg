@@ -12,14 +12,15 @@ use iced::{
     widget::{
         canvas::{self, LineDash, Path, Stroke},
         operation::focus,
+        row,
     },
 };
 
 use shared::{
     DataType::{self, PositionRange, RotationRange, ScaleRange},
-    PCGGraph, PCGNode, PCGNodeType, Pin, connect_pins, delete_graph_file, index_and_pin,
-    load_graph_file, node_from_id, pin_from_uuid, pin_from_uuid_immut, save_graph_file, tf, tp,
-    untp,
+    PCGGraph, PCGNode, PCGNodeType, Pin, PinValue, ValueInput, connect_pins, delete_graph_file,
+    index_and_pin, load_graph_file, node_from_id, pin_from_uuid, pin_from_uuid_immut,
+    save_graph_file, tf, tp, untp,
 };
 
 use uuid::Uuid;
@@ -36,6 +37,9 @@ const DOT_DENSITY: f32 = 20.0;
 const DOT_SIZE: f32 = 1.2;
 const TOP_BAR_BUTTON_PADDING: f32 = 6.0;
 
+pub const TITLE_SIZE: f32 = 20.0;
+pub const TEXT_SIZE: f32 = 14.0;
+
 #[derive(Debug)]
 struct NodePicker {
     visible: bool,
@@ -48,7 +52,7 @@ struct PinInputEditor {
     visible: bool,
     position: Point,
     current_pin_uuid: Uuid,
-    data: Option<Vec<(String, Vec<String>)>>,
+    data: Option<ValueInput>,
 }
 
 #[derive(Debug)]
@@ -108,7 +112,7 @@ pub enum Message {
     AddNewGraph,
     NewGraphNameUpdate(String),
     SaveGraph,
-    SetPinData(Uuid, usize, String),
+    SetPinData(Uuid, String, usize, String),
     ClosePinInputEditor,
     DeleteGraph(String),
     ChangeScreen(Screen),
@@ -473,66 +477,7 @@ impl GraphEditor {
                             if world_mouse.distance(pin_position) <= 7.0 {
                                 opened_pin_input = true;
 
-                                self.pin_input_editor.data = match pin.data_type {
-                                    DataType::Int | DataType::Float => {
-                                        Some(vec![(String::default(), vec!["0".into()])])
-                                    }
-                                    DataType::StringData | DataType::Bool => {
-                                        Some(vec![(String::default(), vec!["".into()])])
-                                    }
-                                    DataType::Position | DataType::Rotation | DataType::Scale => {
-                                        Some(vec![(
-                                            String::default(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        )])
-                                    }
-                                    DataType::Transform => Some(vec![
-                                        (
-                                            "Position".into(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        ),
-                                        (
-                                            "Rotation".into(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        ),
-                                        ("Scale".into(), vec!["x".into(), "y".into(), "z".into()]),
-                                    ]),
-                                    DataType::FloatRange => Some(vec![(
-                                        "Range".into(),
-                                        vec!["from".into(), "to".into()],
-                                    )]),
-                                    PositionRange | RotationRange | ScaleRange => Some(vec![
-                                        ("From".into(), vec!["x".into(), "y".into(), "z".into()]),
-                                        ("To".into(), vec!["x".into(), "y".into(), "z".into()]),
-                                    ]),
-                                    DataType::TransformRange => Some(vec![
-                                        (
-                                            "From Position".into(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        ),
-                                        (
-                                            "To Position".into(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        ),
-                                        (
-                                            "From Rotation".into(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        ),
-                                        (
-                                            "To Rotation".into(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        ),
-                                        (
-                                            "From Scale".into(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        ),
-                                        (
-                                            "To Scale".into(),
-                                            vec!["x".into(), "y".into(), "z".into()],
-                                        ),
-                                    ]),
-                                    _ => None,
-                                };
+                                self.pin_input_editor.data = Some(ValueInput::new(&pin.data_type));
 
                                 if self.pin_input_editor.data.is_some() {
                                     self.pin_input_editor.visible = true;
@@ -619,9 +564,9 @@ impl GraphEditor {
                 self.deleteing = b;
                 Task::none()
             }
-            Message::SetPinData(pin_id, i, s) => {
+            Message::SetPinData(pin_id, row_name, i, string) => {
                 if let Some(pin) = pin_from_uuid(&mut self.graph, pin_id) {
-                    pin.dis_values[i] = s;
+                    pin.value_input.inputs.get_mut(&row_name).unwrap()[i].value = string
                 }
                 Task::none()
             }

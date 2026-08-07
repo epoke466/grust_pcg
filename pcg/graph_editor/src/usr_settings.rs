@@ -1,12 +1,12 @@
 pub mod settings {
     use std::path::PathBuf;
 
-    use crate::{GraphEditor, Message, Screen, TOP_BAR_BUTTON_PADDING};
+    use crate::{GraphEditor, Message, Screen, TEXT_SIZE, TITLE_SIZE, TOP_BAR_BUTTON_PADDING};
     use iced::Theme::*;
     use iced::widget::container::bordered_box;
     use iced::widget::pick_list;
     use iced::{
-        Element, Fill,
+        Element, Fill, Padding,
         widget::{button, column, container, row, scrollable, space, text},
     };
     use strum::{self, IntoEnumIterator};
@@ -86,7 +86,7 @@ pub mod settings {
         column![
             row![
                 space().width(Fill),
-                text("Settings").size(32),
+                text("Settings").size(TITLE_SIZE),
                 space().width(Fill),
                 button(text("Close")).on_press(Message::ChangeScreen(Screen::Main)),
             ]
@@ -94,13 +94,14 @@ pub mod settings {
             container(
                 container(scrollable(column![row![
                     space().width(Fill),
-                    text("Theme"),
+                    text("Theme").size(TEXT_SIZE),
                     space().width(Fill),
                     pick_list(
                         AppTheme::iter().collect::<Vec<_>>(),
                         Some(cfg.theme.clone()),
                         Message::ChangeTheme
-                    ),
+                    )
+                    .text_size(TEXT_SIZE),
                     space().width(Fill),
                 ]]))
                 .padding(10)
@@ -108,7 +109,12 @@ pub mod settings {
                 .height(Fill)
                 .style(bordered_box)
             )
-            .padding(10)
+            .padding(Padding {
+                top: 0.0,
+                right: 10.0,
+                left: 10.0,
+                bottom: 10.0,
+            })
         ]
         .into()
     }

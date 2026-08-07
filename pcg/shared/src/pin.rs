@@ -1,13 +1,14 @@
 pub mod pin {
     use crate::{
         DataType::*, EvalError, Floatable, MeshRef, PCGGraph, PCGPoint, PinValue::FloatRange,
-        SplineData,
+        SplineData, ValueInput,
     };
     use glam::{Quat, Vec3A, vec3a};
     use serde::{Deserialize, Serialize};
+    use strum_macros::Display;
     use uuid::Uuid;
 
-    #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize, Display)]
     pub enum DataType {
         StringData,
         StringArray,
@@ -47,47 +48,22 @@ pub mod pin {
         pub id: Uuid,
         pub connection: Option<Uuid>,
         pub node_id: Uuid,
-        pub dis_values: Vec<String>,
+        pub value_input: ValueInput,
         pub dvid: Uuid,
     }
 
     impl Pin {
         pub fn new(name: &str, data_type: DataType, node_id: Uuid) -> Self {
-            //Dis Value Sizing
-            let needed = match data_type {
-                DataType::Int | DataType::Float | StringData | Bool => 1,
-                DataType::FloatRange => 2,
-                DataType::Position | DataType::Rotation | DataType::Scale => 3,
-                PositionRange | RotationRange | ScaleRange => 6,
-                DataType::Transform => 9,
-                DataType::TransformRange => 18,
-                _ => 0,
-            };
-            let mut workin = Self {
+            Self {
                 name: (String::from(name)),
+                value_input: ValueInput::new(&data_type),
                 data_type,
                 current_position: (0.0, 0.0),
                 id: (Uuid::new_v4()),
                 connection: (None),
                 node_id: node_id,
-                dis_values: Vec::new(),
                 dvid: Uuid::new_v4(),
-            };
-            while workin.dis_values.len() < needed {
-                workin.dis_values.push(String::default());
             }
-            return workin;
-        }
-
-        pub fn dis_vals_assigned(self) -> bool {
-            if !self.dis_values.is_empty() {
-                for v in self.dis_values {
-                    if v != String::default() {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
     }
 

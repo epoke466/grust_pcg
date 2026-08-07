@@ -1,12 +1,13 @@
 pub mod graph {
     use std::{error::Error, fs, io::Result as IOResult, path::PathBuf};
 
-    use crate::PCGNode;
+    use crate::{DataType, PCGNode, PinValue};
     use serde::{Deserialize, Serialize};
 
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct PCGGraph {
         pub nodes: Vec<PCGNode>,
+        pub paramaters: Vec<String>,
         pub version: i64,
     }
 
@@ -75,6 +76,7 @@ pub mod graph {
             Self {
                 nodes: Vec::new(),
                 version: 0,
+                paramaters: Vec::new(),
             }
         }
     }

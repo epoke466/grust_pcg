@@ -116,8 +116,7 @@ pub mod eval {
                             node: node.id,
                             pin: p.name.clone(),
                         }),
-                    None => pin_value_from_dv(&p.data_type, &p.dis_values)
-                        .map(|value| (p.name.clone(), value)),
+                    None => p.value_input.to_pin().map(|value| (p.name.clone(), value)),
                 })
                 .collect::<Result<HashMap<_, _>, _>>()?;
 

@@ -8,6 +8,7 @@ mod pcg_point;
 mod pin;
 mod spline;
 mod ui_scaleing;
+mod value_input;
 
 pub use evaluate::eval::*;
 pub use floatable::floatable::*;
@@ -18,3 +19,4 @@ pub use pcg_point::point::*;
 pub use pin::pin::*;
 pub use spline::spline::*;
 pub use ui_scaleing::tf::*;
+pub use value_input::value_input::*;

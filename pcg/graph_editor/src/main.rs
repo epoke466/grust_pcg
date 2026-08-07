@@ -12,13 +12,11 @@ use iced::{
     widget::{
         canvas::{self, LineDash, Path, Stroke},
         operation::focus,
-        row,
     },
 };
 
 use shared::{
-    DataType::{self, PositionRange, RotationRange, ScaleRange},
-    PCGGraph, PCGNode, PCGNodeType, Pin, PinValue, ValueInput, connect_pins, delete_graph_file,
+    PCGGraph, PCGNode, PCGNodeType, Pin, ValueInput, connect_pins, delete_graph_file,
     index_and_pin, load_graph_file, node_from_id, pin_from_uuid, pin_from_uuid_immut,
     save_graph_file, tf, tp, untp,
 };
@@ -52,7 +50,6 @@ struct PinInputEditor {
     visible: bool,
     position: Point,
     current_pin_uuid: Uuid,
-    data: Option<ValueInput>,
 }
 
 #[derive(Debug)]
@@ -464,8 +461,6 @@ impl GraphEditor {
                 let world_mouse = untp(self.mouse_position, self.canvas.transform);
                 let mut opened_pin_input = false;
 
-                self.pin_input_editor.data = None; // clear stale state every click
-
                 'find_pin: for node in &self.graph.nodes {
                     if self
                         .mouse_position
@@ -477,14 +472,15 @@ impl GraphEditor {
                             if world_mouse.distance(pin_position) <= 7.0 {
                                 opened_pin_input = true;
 
-                                self.pin_input_editor.data = Some(ValueInput::new(&pin.data_type));
-
-                                if self.pin_input_editor.data.is_some() {
-                                    self.pin_input_editor.visible = true;
-                                    self.pin_input_editor.position =
-                                        tp(pin_position, self.canvas.transform);
-                                    self.pin_input_editor.current_pin_uuid = pin.id;
+                                self.pin_input_editor.current_pin_uuid = pin.id;
+                                if let Some(pin) = pin_from_uuid_immut(&self.graph, pin.id) {
+                                    match &pin.value_input {
+                                        Some(v) => self.pin_input_editor.visible = true,
+                                        None => {}
+                                    }
                                 }
+                                self.pin_input_editor.position =
+                                    tp(pin_position, self.canvas.transform);
 
                                 break 'find_pin; // stop scanning once we've matched a pin
                             }
@@ -566,7 +562,10 @@ impl GraphEditor {
             }
             Message::SetPinData(pin_id, row_name, i, string) => {
                 if let Some(pin) = pin_from_uuid(&mut self.graph, pin_id) {
-                    pin.value_input.inputs.get_mut(&row_name).unwrap()[i].value = string
+                    match &mut pin.value_input {
+                        Some(v) => v.inputs.get_mut(&row_name).unwrap()[i].value = string,
+                        None => {}
+                    }
                 }
                 Task::none()
             }
@@ -607,7 +606,6 @@ impl Default for GraphEditor {
             pin_input_editor: PinInputEditor {
                 visible: false,
                 position: iced::Point::default(),
-                data: None,
                 current_pin_uuid: Uuid::nil(),
             },
             mouse_position: iced::Point::default(),

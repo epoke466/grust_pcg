@@ -160,30 +160,31 @@ mod view {
             let pin_id = self.pin_input_editor.current_pin_uuid;
 
             if let Some(pin) = pin_from_uuid_immut(&self.graph, pin_id) {
-                let value_input = &pin.value_input;
-                pin_input_column = pin_input_column
-                    .push(text(value_input.name()).size(TITLE_SIZE))
-                    .align_x(Center);
+                if let Some(value_input) = &pin.value_input {
+                    pin_input_column = pin_input_column
+                        .push(text(value_input.name()).size(TITLE_SIZE))
+                        .align_x(Center);
 
-                for row_name in value_input.inputs.keys() {
-                    let mut roo: Row<'_, Message> = row![].padding(2);
+                    for row_name in value_input.inputs.keys() {
+                        let mut roo: Row<'_, Message> = row![].padding(2);
 
-                    roo = roo.push(
-                        text(row_name)
-                            .width(Length::Fixed(100.0))
-                            .wrapping(text::Wrapping::Word)
-                            .size(TEXT_SIZE),
-                    );
-                    for (i, text) in value_input.inputs[row_name].iter().enumerate() {
                         roo = roo.push(
-                            text_input(&text.placeholder, &text.value)
-                                .size(TEXT_SIZE)
-                                .on_input(move |v| {
-                                    Message::SetPinData(pin_id, row_name.clone(), i, v)
-                                }),
+                            text(row_name)
+                                .width(Length::Fixed(100.0))
+                                .wrapping(text::Wrapping::Word)
+                                .size(TEXT_SIZE),
                         );
+                        for (i, text) in value_input.inputs[row_name].iter().enumerate() {
+                            roo = roo.push(
+                                text_input(&text.placeholder, &text.value)
+                                    .size(TEXT_SIZE)
+                                    .on_input(move |v| {
+                                        Message::SetPinData(pin_id, row_name.clone(), i, v)
+                                    }),
+                            );
+                        }
+                        pin_input_column = pin_input_column.push(roo);
                     }
-                    pin_input_column = pin_input_column.push(roo);
                 }
             }
 

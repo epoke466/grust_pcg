@@ -48,7 +48,7 @@ pub mod pin {
         pub id: Uuid,
         pub connection: Option<Uuid>,
         pub node_id: Uuid,
-        pub value_input: ValueInput,
+        pub value_input: Option<ValueInput>,
         pub dvid: Uuid,
     }
 
@@ -56,7 +56,10 @@ pub mod pin {
         pub fn new(name: &str, data_type: DataType, node_id: Uuid) -> Self {
             Self {
                 name: (String::from(name)),
-                value_input: ValueInput::new(&data_type),
+                value_input: match data_type {
+                    Spline | SplineArray | Mesh | MeshArray | Point | PointArray | Noise3D => None,
+                    _ => Some(ValueInput::new(&data_type)),
+                },
                 data_type,
                 current_position: (0.0, 0.0),
                 id: (Uuid::new_v4()),
